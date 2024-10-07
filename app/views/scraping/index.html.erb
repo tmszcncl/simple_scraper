@@ -92,7 +92,7 @@
           <tbody>
           <% @recent_scrape.result.each do |field, value| %>
             <tr class="border-b">
-              <td class="px-4 py-2 font-medium"><%= field.humanize %></td>
+              <td class="px-4 py-2 font-medium"><%= field %></td>
               <td class="px-4 py-2"><%= value.present? ? value : 'N/A' %></td>
             </tr>
           <% end %>
@@ -120,7 +120,7 @@
                 <tbody>
                 <% scrape.result.each do |field, value| %>
                   <tr class="border-b">
-                    <td class="px-4 py-2 font-medium text-indigo-600"><%= field.humanize %></td>
+                    <td class="px-4 py-2 font-medium text-indigo-600"><%= field %></td>
                     <td class="px-4 py-2 text-gray-700"><%= value.present? ? value : 'N/A' %></td>
                   </tr>
                 <% end %>
