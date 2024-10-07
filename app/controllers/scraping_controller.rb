@@ -1,6 +1,3 @@
-require 'nokogiri'
-require 'open-uri'
-
 class ScrapingController < ApplicationController
   def index
     @recent_scrape = ScrapeRequest.order(scraped_at: :desc).first
@@ -9,21 +6,24 @@ class ScrapingController < ApplicationController
 
   def create
     url = params[:url]
-    fields = params[:fields]
+    fields = params[:fields].map { |field| [field[:name], field[:selector]] }.to_h
 
     begin
       html = URI.open(url)
       doc = Nokogiri::HTML(html)
       results = {}
 
-      fields.each do |key, selector|
-        results[key] = doc.css(selector).text.strip
+      fields.each do |name, selector|
+        results[name] = doc.css(selector).text.strip
       end
+
+      host_name = URI.parse(url).host
 
       scrape_request = ScrapeRequest.create!(
         url: url,
         fields: fields,
         result: results,
+        host: host_name,
         scraped_at: Time.now
       )
 
