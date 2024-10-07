@@ -1,5 +1,6 @@
 class ScrapeRequest < ApplicationRecord
   attr_accessor url: String
   attr_accessor fields: Hash[String, String]
+  attr_accessor result: Hash[String, String]
   attr_accessor scraped_at: Time
 end

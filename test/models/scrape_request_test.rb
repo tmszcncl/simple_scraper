@@ -20,4 +20,14 @@ class ScrapeRequestTest < ActiveSupport::TestCase
     scrape_request = ScrapeRequest.new(url: "https://www.example.com", fields: { price: ".price-box__price" }, scraped_at: Time.now)
     assert scrape_request.save, "Could not save a valid ScrapeRequest"
   end
+
+  test "should save ScrapeRequest with result" do
+    scrape_request = ScrapeRequest.new(
+      url: "https://www.example.com",
+      fields: { price: ".price-box__price" },
+      result: { price: "1000" },
+      scraped_at: Time.now
+    )
+    assert scrape_request.save, "Could not save ScrapeRequest with a result"
+  end
 end
