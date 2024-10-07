@@ -90,7 +90,7 @@
           </tr>
           </thead>
           <tbody>
-          <% @recent_scrape.result.each do |field, value| %>
+          <% @recent_scrape&.result&.each do |field, value| %>
             <tr class="border-b">
               <td class="px-4 py-2 font-medium"><%= field %></td>
               <td class="px-4 py-2"><%= value.present? ? value : 'N/A' %></td>
@@ -102,7 +102,7 @@
     <% end %>
 
     <!-- History -->
-    <% if @previous_scrapes.any? %>
+    <% if @previous_scrapes&.any? %>
       <div id="history" class="mt-12 bg-white rounded-xl p-8 shadow-lg border border-indigo-100">
         <h2 class="text-2xl font-bold mb-4 text-indigo-700">Scraping History</h2>
         <ul class="space-y-4">
@@ -118,7 +118,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <% scrape.result.each do |field, value| %>
+                <% scrape&.result&.each do |field, value| %>
                   <tr class="border-b">
                     <td class="px-4 py-2 font-medium text-indigo-600"><%= field %></td>
                     <td class="px-4 py-2 text-gray-700"><%= value.present? ? value : 'N/A' %></td>

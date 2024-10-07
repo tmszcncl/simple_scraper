@@ -8,7 +8,7 @@ class ScrapingController < ApplicationController
 
   def create
     url = params[:url]
-    fields = params[:fields].map { |field| [ field[:name], field[:selector] ] }.to_h
+    fields = params[:fields].map { |field| [field[:name], field[:selector]] }.to_h
 
     begin
       puts "Scraping URL: #{url}"
@@ -44,6 +44,7 @@ class ScrapingController < ApplicationController
     rescue => e
       flash[:error] = "Failed to scrape the page: #{e.message}"
       puts "Error during scraping: #{e.message}"
+      redirect_to root_path
     end
   end
 end
