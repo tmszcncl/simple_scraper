@@ -1,4 +1,4 @@
-require 'open-uri'
+require "open-uri"
 
 class ScrapingController < ApplicationController
   def index
@@ -8,7 +8,7 @@ class ScrapingController < ApplicationController
 
   def create
     url = params[:url]
-    fields = params[:fields].map { |field| [field[:name], field[:selector]] }.to_h
+    fields = params[:fields].map { |field| [ field[:name], field[:selector] ] }.to_h
 
     begin
       puts "Scraping URL: #{url}"
@@ -23,7 +23,7 @@ class ScrapingController < ApplicationController
         element = doc.css(selector)
         puts "Found elements: #{element.inspect}"
 
-        results[name] = element.any? ? element.text.strip : 'N/A'
+        results[name] = element.any? ? element.text.strip : "N/A"
         puts "Scraped value: #{results[name]}"
       end
 
