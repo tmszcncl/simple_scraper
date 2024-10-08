@@ -1,199 +1,212 @@
 <body class="h-full bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 text-gray-800">
-  <div class="container mx-auto px-4 py-8">
-    <!-- Header -->
-    <header class="text-center mb-12">
-      <h1 class="text-5xl font-bold mb-4 text-indigo-700">Simple Scraper</h1>
-      <p class="text-xl text-gray-600">Extract data from any website with ease</p>
-    </header>
+<div class="container mx-auto px-4 py-8">
+  <!-- Flash messages -->
+  <% if flash[:notice] %>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+      <span class="block sm:inline"><%= flash[:notice] %></span>
+    </div>
+  <% elsif flash[:error] %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <span class="block sm:inline"><%= flash[:error] %></span>
+    </div>
+  <% end %>
 
-    <!-- Main Content - Grid Layout -->
-    <div class="grid md:grid-cols-2 gap-8">
-      <!-- Form Box -->
-      <div class="bg-white rounded-xl p-8 shadow-lg border border-indigo-100 transform hover:scale-105 transition-transform duration-300">
-        <form action="/scraping" method="POST" class="space-y-6">
-          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <!-- Header -->
+  <header class="text-center mb-12">
+      <h1 class="text-5xl font-bold mb-4 text-indigo-700 p-8">
+    <%= link_to "Simple Scraper", root_path %>
+  </h1>
+    <p class="text-xl text-gray-600">Extract data from any website with ease</p>
+  </header>
 
-          <!-- URL Input -->
-          <div>
-            <label for="url" class="block text-sm font-medium mb-2 text-indigo-600">URL to Scrape</label>
-            <div class="relative">
+  <!-- Main Content - Grid Layout -->
+  <div class="grid md:grid-cols-2 gap-8">
+    <!-- Form Box -->
+    <div class="bg-white rounded-xl p-8 shadow-lg border border-indigo-100 transform hover:scale-105 transition-transform duration-300">
+      <form action="/scraping" method="POST" class="space-y-6">
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+        <!-- URL Input -->
+        <div>
+          <label for="url" class="block text-sm font-medium mb-2 text-indigo-600">URL to Scrape</label>
+          <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
                 <i class="fas fa-link"></i>
               </span>
-              <input type="url" id="url" name="url" required
-                     class="w-full pl-10 pr-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-            </div>
+            <input type="url" id="url" name="url" required
+                   class="w-full pl-10 pr-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
           </div>
-
-          <!-- CSS Selectors Input -->
-          <div id="cssSelectors">
-            <label class="block text-sm font-medium mb-2 text-indigo-600">CSS Selectors</label>
-            <div class="space-y-2">
-              <div class="flex items-center space-x-2">
-                <input type="text" name="fields[][name]" placeholder="Field name (e.g., price)"
-                       class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-
-                <input type="text" name="fields[][selector]" placeholder="CSS selector (e.g., .price-box__price)"
-                       class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-
-                <button type="button" class="addSelector px-3 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors">
-                  <i class="fas fa-plus"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Meta Tags Input -->
-          <div id="metaTags">
-            <label class="block text-sm font-medium mb-2 text-indigo-600">Meta Tags</label>
-            <div class="space-y-2">
-              <div class="flex items-center space-x-2">
-                <input type="text" name="meta[]" placeholder="Meta tag name (e.g., description)"
-                       class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-
-                <button type="button" class="addMetaTag px-3 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors">
-                  <i class="fas fa-plus"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <div>
-            <button type="submit" class="w-full px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-md hover:from-indigo-600 hover:to-purple-700 transition-colors font-medium flex items-center justify-center">
-              <i class="fas fa-spider mr-2"></i> Scrape
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- How it Works Box -->
-      <div class="relative">
-        <div class="absolute inset-0 bg-indigo-100 opacity-50 rounded-xl"></div>
-        <div class="relative z-10 p-8">
-          <h2 class="text-3xl font-bold mb-6 text-indigo-700">How it works</h2>
-          <ul class="space-y-4">
-            <li class="flex items-center space-x-3">
-              <span class="text-indigo-500 text-xl float"><i class="fas fa-globe"></i></span>
-              <span>Enter the URL of the website you want to scrape</span>
-            </li>
-            <li class="flex items-center space-x-3">
-              <span class="text-indigo-500 text-xl float"><i class="fas fa-code"></i></span>
-              <span>Add CSS selectors to target specific elements</span>
-            </li>
-            <li class="flex items-center space-x-3">
-              <span class="text-indigo-500 text-xl float"><i class="fas fa-magic"></i></span>
-              <span>Click 'Scrape' and watch the magic happen!</span>
-            </li>
-          </ul>
         </div>
-      </div>
+
+        <!-- CSS Selectors Input -->
+        <div id="cssSelectors">
+          <label class="block text-sm font-medium mb-2 text-indigo-600">CSS Selectors</label>
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2">
+              <input type="text" name="fields[][name]" placeholder="Field name (e.g., price)"
+                     class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+
+              <input type="text" name="fields[][selector]" placeholder="CSS selector (e.g., .price-box__price)"
+                     class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+
+              <button type="button" class="addSelector px-3 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meta Tags Input -->
+        <div id="metaTags">
+          <label class="block text-sm font-medium mb-2 text-indigo-600">Meta Tags</label>
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2">
+              <input type="text" name="meta[]" placeholder="Meta tag name (e.g., description)"
+                     class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+
+              <button type="button" class="addMetaTag px-3 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+          <button type="submit" class="w-full px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-md hover:from-indigo-600 hover:to-purple-700 transition-colors font-medium flex items-center justify-center">
+            <i class="fas fa-spider mr-2"></i> Scrape
+          </button>
+        </div>
+      </form>
     </div>
 
-    <!-- Most Recent Result - Highlighted -->
-    <% if @recent_scrape %>
-      <div id="results" class="mt-12 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl p-8 shadow-lg border border-indigo-100 transform hover:scale-105 transition-transform duration-300">
-        <h2 class="text-3xl font-bold mb-4">Most Recent Result</h2>
-        <p class="text-sm mb-2">Scraped from: <span class="font-semibold"><%= @recent_scrape.host %></span></p>
-        <p class="text-sm mb-6">Scraped at: <span class="font-semibold"><%= @recent_scrape.scraped_at.strftime("%Y-%m-%d %H:%M:%S") %></span></p>
-
-        <table class="w-full bg-white rounded-md p-4 text-indigo-600">
-          <thead class="bg-indigo-200">
-          <tr>
-            <th class="px-4 py-2 text-left">Field</th>
-            <th class="px-4 py-2 text-left">Value</th>
-          </tr>
-          </thead>
-          <tbody>
-          <% if @recent_scrape&.result&.dig("fields") %>
-            <% @recent_scrape.result["fields"].each do |field, value| %>
-              <tr class="border-b">
-                <td class="px-4 py-2 font-medium"><%= field %></td>
-                <td class="px-4 py-2"><%= value.present? ? value : 'N/A' %></td>
-              </tr>
-            <% end %>
-          <% end %>
-
-          <!-- Meta Fields -->
-          <% if @recent_scrape&.result&.dig("meta") %>
-            <tr class="bg-indigo-200">
-              <td colspan="2" class="font-semibold text-indigo-600 p-4">Meta Tags</td>
-            </tr>
-            <% @recent_scrape.result["meta"].each do |meta_name, meta_value| %>
-              <tr>
-                <td class="px-4 py-2 text-indigo-600"><%= meta_name %></td>
-                <td class="px-4 py-2 text-gray-700"><%= meta_value %></td>
-              </tr>
-            <% end %>
-          <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% end %>
-
-    <!-- History -->
-    <% if @previous_scrapes&.any? %>
-      <div id="history" class="mt-12 bg-white rounded-xl p-8 shadow-lg border border-indigo-100">
-        <h2 class="text-2xl font-bold mb-4 text-indigo-700">Scraping History</h2>
+    <!-- How it Works Box -->
+    <div class="relative">
+      <div class="absolute inset-0 bg-indigo-100 opacity-50 rounded-xl"></div>
+      <div class="relative z-10 p-8">
+        <h2 class="text-3xl font-bold mb-6 text-indigo-700">How it works</h2>
         <ul class="space-y-4">
-          <% @previous_scrapes.each do |scrape| %>
-            <li class="border-t pt-4">
-              <h3 class="text-lg font-bold text-indigo-600">Scraped at: <%= scrape.scraped_at.strftime("%Y-%m-%d %H:%M:%S") %> | <%= scrape.host %></h3>
-
-              <table class="w-full bg-indigo-50 rounded-md p-4 mt-2">
-                <thead class="bg-indigo-200">
-                <tr>
-                  <th class="px-4 py-2 text-left">Field</th>
-                  <th class="px-4 py-2 text-left">Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                <% if scrape&.result&.dig("fields") %>
-                  <% scrape.result["fields"].each do |field, value| %>
-                    <tr class="border-b">
-                      <td class="px-4 py-2 font-medium text-indigo-600"><%= field %></td>
-                      <td class="px-4 py-2 text-gray-700"><%= value.present? ? value : 'N/A' %></td>
-                    </tr>
-                  <% end %>
-                <% end %>
-
-                <!-- Meta Fields -->
-                <% if scrape&.result&.dig("meta") %>
-                  <tr class="bg-indigo-200">
-                    <td colspan="2" class="font-semibold text-indigo-600 p-4">Meta Tags</td>
-                  </tr>
-                  <% scrape.result["meta"].each do |meta_name, meta_value| %>
-                    <tr>
-                      <td class="px-4 py-2 text-indigo-600"><%= meta_name %></td>
-                      <td class="px-4 py-2 text-gray-700"><%= meta_value %></td>
-                    </tr>
-                  <% end %>
-                <% end %>
-                </tbody>
-              </table>
-            </li>
-          <% end %>
+          <li class="flex items-center space-x-3">
+            <span class="text-indigo-500 text-xl float"><i class="fas fa-globe"></i></span>
+            <span>Enter the URL of the website you want to scrape</span>
+          </li>
+          <li class="flex items-center space-x-3">
+            <span class="text-indigo-500 text-xl float"><i class="fas fa-code"></i></span>
+            <span>Add CSS selectors to target specific elements</span>
+          </li>
+          <li class="flex items-center space-x-3">
+            <span class="text-indigo-500 text-xl float"><i class="fas fa-magic"></i></span>
+            <span>Click 'Scrape' and watch the magic happen!</span>
+          </li>
         </ul>
       </div>
-    <% end %>
+    </div>
   </div>
+
+  <!-- Most Recent Result - Highlighted -->
+  <% if @recent_scrape %>
+    <div id="results" class="mt-12 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl p-8 shadow-lg border border-indigo-100 transform hover:scale-105 transition-transform duration-300">
+      <h2 class="text-3xl font-bold mb-4">Most Recent Result</h2>
+      <p class="text-sm mb-2">Scraped from: <span class="font-semibold"><%= @recent_scrape.host %></span></p>
+      <p class="text-sm mb-6">Scraped at: <span class="font-semibold"><%= @recent_scrape.scraped_at.strftime("%Y-%m-%d %H:%M:%S") %></span></p>
+
+      <table class="w-full bg-white rounded-md p-4 text-indigo-600">
+        <thead class="bg-indigo-200">
+        <tr>
+          <th class="px-4 py-2 text-left">Field</th>
+          <th class="px-4 py-2 text-left">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% if @recent_scrape&.result&.dig("fields") %>
+          <% @recent_scrape.result["fields"].each do |field, value| %>
+            <tr class="border-b">
+              <td class="px-4 py-2 font-medium"><%= field %></td>
+              <td class="px-4 py-2"><%= value.present? ? value : 'N/A' %></td>
+            </tr>
+          <% end %>
+        <% end %>
+
+        <!-- Meta Fields -->
+        <% if @recent_scrape&.result&.dig("meta") %>
+          <tr class="bg-indigo-200">
+            <td colspan="2" class="font-semibold text-indigo-600 p-4">Meta Tags</td>
+          </tr>
+          <% @recent_scrape.result["meta"].each do |meta_name, meta_value| %>
+            <tr>
+              <td class="px-4 py-2 text-indigo-600"><%= meta_name %></td>
+              <td class="px-4 py-2 text-gray-700"><%= meta_value %></td>
+            </tr>
+          <% end %>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <!-- History -->
+  <% if @previous_scrapes&.any? %>
+    <div id="history" class="mt-12 bg-white rounded-xl p-8 shadow-lg border border-indigo-100">
+      <h2 class="text-2xl font-bold mb-4 text-indigo-700">Scraping History</h2>
+      <ul class="space-y-4">
+        <% @previous_scrapes.each do |scrape| %>
+          <li class="border-t pt-4">
+            <h3 class="text-lg font-bold text-indigo-600">Scraped at: <%= scrape.scraped_at.strftime("%Y-%m-%d %H:%M:%S") %> | <%= scrape.host %></h3>
+
+            <table class="w-full bg-indigo-50 rounded-md p-4 mt-2">
+              <thead class="bg-indigo-200">
+              <tr>
+                <th class="px-4 py-2 text-left">Field</th>
+                <th class="px-4 py-2 text-left">Value</th>
+              </tr>
+              </thead>
+              <tbody>
+              <% if scrape&.result&.dig("fields") %>
+                <% scrape.result["fields"].each do |field, value| %>
+                  <tr class="border-b">
+                    <td class="px-4 py-2 font-medium text-indigo-600"><%= field %></td>
+                    <td class="px-4 py-2 text-gray-700"><%= value.present? ? value : 'N/A' %></td>
+                  </tr>
+                <% end %>
+              <% end %>
+
+              <!-- Meta Fields -->
+              <% if scrape&.result&.dig("meta") %>
+                <tr class="bg-indigo-200">
+                  <td colspan="2" class="font-semibold text-indigo-600 p-4">Meta Tags</td>
+                </tr>
+                <% scrape.result["meta"].each do |meta_name, meta_value| %>
+                  <tr>
+                    <td class="px-4 py-2 text-indigo-600"><%= meta_name %></td>
+                    <td class="px-4 py-2 text-gray-700"><%= meta_value %></td>
+                  </tr>
+                <% end %>
+              <% end %>
+              </tbody>
+            </table>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>
 </body>
 
 <script>
-  // JavaScript for adding dynamic fields and form submission
-  document.querySelectorAll('.addSelector').forEach(button => {
-    button.addEventListener('click', function () {
-      const newField = this.parentElement.cloneNode(true);
-      newField.querySelector('input').value = '';
-      this.parentElement.parentElement.appendChild(newField);
+    // JavaScript for adding dynamic fields and form submission
+    document.querySelectorAll('.addSelector').forEach(button => {
+        button.addEventListener('click', function () {
+            const newField = this.parentElement.cloneNode(true);
+            newField.querySelector('input').value = '';
+            this.parentElement.parentElement.appendChild(newField);
+        });
     });
-  });
 
-  document.querySelectorAll('.addMetaTag').forEach(button => {
-    button.addEventListener('click', function () {
-      const newField = this.parentElement.cloneNode(true);
-      newField.querySelector('input').value = '';
-      this.parentElement.parentElement.appendChild(newField);
+    document.querySelectorAll('.addMetaTag').forEach(button => {
+        button.addEventListener('click', function () {
+            const newField = this.parentElement.cloneNode(true);
+            newField.querySelector('input').value = '';
+            this.parentElement.parentElement.appendChild(newField);
+        });
     });
-  });
 </script>
