@@ -20,7 +20,7 @@ class ScrapingControllerTest < ActionDispatch::IntegrationTest
     assert_difference("ScrapeRequest.count", 1) do
       post scraping_url, params: {
         url: "http://example.com",
-        meta: ["description"]
+        meta: [ "description" ]
       }, as: :json
     end
 
@@ -40,7 +40,7 @@ class ScrapingControllerTest < ActionDispatch::IntegrationTest
         fields: [
           { name: "price", selector: ".price" }
         ],
-        meta: ["description"]
+        meta: [ "description" ]
       }
     end
 

@@ -11,10 +11,10 @@ class ScrapingController < ApplicationController
 
     fields = if params[:fields].is_a?(Array)
                params[:fields]&.reject { |field| field[:name].blank? || field[:selector].blank? }
-                              .map { |field| [field[:name], field[:selector]] }.to_h
-             else
+                              .map { |field| [ field[:name], field[:selector] ] }.to_h
+    else
                {}
-             end
+    end
 
     meta_tags = params[:meta]&.reject(&:blank?) || []
 
