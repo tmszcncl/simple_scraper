@@ -5,9 +5,15 @@ class ScrapingControllerTest < ActionDispatch::IntegrationTest
   def setup
     stub_request(:get, "http://example.com/")
       .with(headers: {
-        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
       })
       .to_return(status: 200, body: "<html><body><div class='price'>100 USD</div></body></html>", headers: {})
+
+  stub_request(:get, "http://invalid-url/")
+  .with(headers: {
+    "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  })
+  .to_return(status: 404, body: "Not Found", headers: {})
   end
 
   test "should get index" do
@@ -39,8 +45,8 @@ class ScrapingControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", "Scraping History", false
   end
 
-  test "should create scrape request" do
-    assert_difference('ScrapeRequest.count', 1) do
+  test "should create scrape request via UI" do
+    assert_difference("ScrapeRequest.count", 1) do
       post scraping_url, params: {
         url: "http://example.com",
         fields: [
@@ -62,9 +68,23 @@ class ScrapingControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", "100 USD"
   end
 
-  test "should handle scraping errors" do
+  test "should create scrape request via API" do
+    assert_difference("ScrapeRequest.count", 1) do
+      post scraping_url, params: {
+        url: "http://example.com",
+        fields: { price: ".price" }
+      }, as: :json
+    end
+
+    assert_response :created
+    recent_scrape = ScrapeRequest.order(scraped_at: :desc).first
+    assert_equal "http://example.com", recent_scrape.url
+    assert_equal({ "price" => ".price" }, recent_scrape.fields)
+  end
+
+  test "should handle scraping errors via UI" do
     post scraping_url, params: {
-      url: "invalid-url",
+      url: "http://invalid-url",
       fields: [
         { name: "price", selector: ".price" }
       ]
@@ -75,4 +95,16 @@ class ScrapingControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "Failed to scrape the page", flash[:error]
   end
+
+test "should handle scraping errors via API" do
+  post scraping_url, params: {
+    url: "http://invalid-url",
+    fields: { price: ".price" }
+  }, as: :json
+
+  assert_response :unprocessable_entity
+  json_response = JSON.parse(response.body)
+
+  assert_equal "404 ", json_response["error"], "Expected error message for invalid URL"
+end
 end

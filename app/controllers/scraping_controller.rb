@@ -8,7 +8,26 @@ class ScrapingController < ApplicationController
 
   def create
     url = params[:url]
-    fields = params[:fields].map { |field| [field[:name], field[:selector]] }.to_h
+
+    if params[:fields].is_a?(Array)
+      fields = params[:fields].map { |field| [ field[:name], field[:selector] ] }.to_h
+    else
+      fields = params[:fields].permit!.to_h
+    end
+
+    # Ensure URL starts with a valid protocol
+    unless url =~ /\Ahttps?:\/\//
+      respond_to do |format|
+        format.html do
+          flash[:error] = "Invalid URL format."
+          redirect_to root_path
+        end
+        format.json do
+          render json: { error: "Invalid URL format." }, status: :unprocessable_entity
+        end
+      end
+      return
+    end
 
     begin
       puts "Scraping URL: #{url}"
@@ -39,12 +58,21 @@ class ScrapingController < ApplicationController
       )
       puts "Scrape request saved: #{scrape_request.inspect}"
 
-      redirect_to root_path, notice: "Scraping completed successfully."
+      respond_to do |format|
+        format.html { redirect_to root_path, notice: "Scraping completed successfully." }
+        format.json { render json: scrape_request, status: :created }
+      end
 
     rescue => e
-      flash[:error] = "Failed to scrape the page: #{e.message}"
-      puts "Error during scraping: #{e.message}"
-      redirect_to root_path
+      respond_to do |format|
+        format.html do
+          flash[:error] = "Failed to scrape the page: #{e.message}"
+          redirect_to root_path
+        end
+        format.json do
+          render json: { error: e.message }, status: :unprocessable_entity
+        end
+      end
     end
   end
 end
