@@ -1,0 +1,17 @@
+class ScrapingController
+  def index: () -> void
+
+  def create: () -> void
+
+  private
+
+  def sanitize_fields: (Array[Hash[Symbol, String]]?) -> Hash[String, String]
+
+  def valid_url?: (String) -> (Integer | nil)
+
+  def handle_invalid_url: () -> void
+
+  def handle_empty_fields_and_meta: () -> void
+
+  def handle_scraping_error: (Exception) -> void
+end

@@ -1,5 +1,3 @@
-require "open-uri"
-
 class ScrapingController < ApplicationController
   def index
     @recent_scrape = ScrapeRequest.order(scraped_at: :desc).first
@@ -8,76 +6,29 @@ class ScrapingController < ApplicationController
 
   def create
     url = params[:url]
-
-    fields = if params[:fields].is_a?(Array)
-               params[:fields]&.reject { |field| field[:name].blank? || field[:selector].blank? }
-                              .map { |field| [ field[:name], field[:selector] ] }.to_h
-    else
-               {}
-    end
-
+    fields = sanitize_fields(params[:fields])
     meta_tags = params[:meta]&.reject(&:blank?) || []
 
     # Ensure URL starts with a valid protocol
-    unless url =~ /\Ahttps?:\/\//
-      respond_to do |format|
-        format.html do
-          flash[:error] = "Invalid URL format."
-          redirect_to root_path
-        end
-        format.json do
-          render json: { error: "Invalid URL format." }, status: :unprocessable_entity
-        end
-      end
+    unless valid_url?(url)
+      handle_invalid_url
       return
     end
 
     if fields.empty? && meta_tags.empty?
-      respond_to do |format|
-        format.html do
-          flash[:error] = "Either fields or meta tags must be present"
-          redirect_to root_path
-        end
-        format.json do
-          render json: { error: "Either fields or meta tags must be present" }, status: :unprocessable_entity
-        end
-      end
+      handle_empty_fields_and_meta
       return
     end
 
     begin
-      puts "Scraping URL: #{url}"
-      puts "Fields: #{fields.inspect}"
-      puts "Meta tags: #{meta_tags.inspect}"
-
-      html = Rails.cache.fetch(url, expires_in: AppConfig::CACHE_EXPIRATION_TIME) do
-        URI.open(url, "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").read
-      end
-
-      doc = Nokogiri::HTML(html)
-
-      results = {}
-      fields.each do |name, selector|
-        puts "Scraping field: #{name} with selector: #{selector}"
-        element = doc.css(selector)
-        results[name] = element.any? ? element.text.strip : "N/A"
-      end
-
-      meta_results = {}
-      if meta_tags.any?
-        meta_tags.each do |meta_tag_name|
-          meta_tag = doc.at("meta[name='#{meta_tag_name}']") || doc.at("meta[property='#{meta_tag_name}']")
-          meta_results[meta_tag_name] = meta_tag ? meta_tag["content"] : "N/A"
-        end
-      end
-
-      host = URI.parse(url)
+      scraping_service = ScrapingService.new(url: url, fields: fields, meta_tags: meta_tags)
+      results = scraping_service.call
 
       scrape_request = ScrapeRequest.create!(
         url: url,
         fields: fields,
-        result: { "fields" => results, "meta" => meta_results },
-        host: host,
+        result: results,
+        host: URI.parse(url),
         scraped_at: Time.now
       )
 
@@ -87,14 +38,55 @@ class ScrapingController < ApplicationController
       end
 
     rescue => e
-      respond_to do |format|
-        format.html do
-          flash[:error] = "Failed to scrape the page: #{e.message}"
-          redirect_to root_path
-        end
-        format.json do
-          render json: { error: e.message }, status: :unprocessable_entity
-        end
+      handle_scraping_error(e)
+    end
+  end
+
+  private
+
+  def sanitize_fields(fields)
+    return {} unless fields.is_a?(Array)
+
+    fields&.reject { |field| field[:name].blank? || field[:selector].blank? }
+           &.map { |field| [ field[:name], field[:selector] ] }&.to_h || {}
+  end
+
+  def valid_url?(url)
+    url =~ /\Ahttps?:\/\//
+  end
+
+  def handle_invalid_url
+    respond_to do |format|
+      format.html do
+        flash[:error] = "Invalid URL format."
+        redirect_to root_path
+      end
+      format.json do
+        render json: { error: "Invalid URL format." }, status: :unprocessable_entity
+      end
+    end
+  end
+
+  def handle_empty_fields_and_meta
+    respond_to do |format|
+      format.html do
+        flash[:error] = "Either fields or meta tags must be present"
+        redirect_to root_path
+      end
+      format.json do
+        render json: { error: "Either fields or meta tags must be present" }, status: :unprocessable_entity
+      end
+    end
+  end
+
+  def handle_scraping_error(exception)
+    respond_to do |format|
+      format.html do
+        flash[:error] = "Failed to scrape the page: #{exception.message}"
+        redirect_to root_path
+      end
+      format.json do
+        render json: { error: exception.message }, status: :unprocessable_entity
       end
     end
   end

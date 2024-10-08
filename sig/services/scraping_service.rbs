@@ -1,0 +1,17 @@
+class ScrapingService
+  @url: String
+  @fields: Hash[String, String]
+  @meta_tags: Array[String]
+
+  def initialize: (url: String, fields: Hash[String, String], meta_tags: Array[String]) -> void
+
+  def call: () -> Hash[String, Hash[String, String]]
+
+  private
+
+  def fetch_html: () -> String
+
+  def scrape_fields: (Nokogiri::HTML::Document) -> Hash[String, String]
+
+  def scrape_meta_tags: (Nokogiri::HTML::Document) -> Hash[String, String]
+end

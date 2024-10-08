@@ -1,4 +1,4 @@
-class ScrapeRequest < ApplicationRecord
+class ScrapeRequest
   attr_accessor url: String
   attr_accessor fields: Hash[String, String]
   attr_accessor result: Hash[String, String]
