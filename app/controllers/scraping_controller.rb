@@ -9,8 +9,14 @@ class ScrapingController < ApplicationController
   def create
     url = params[:url]
 
-    fields = params[:fields].is_a?(Array) ? params[:fields].map { |field| [field[:name], field[:selector]] }.to_h : {}
-    meta_tags = params[:meta] || []
+    fields = if params[:fields].is_a?(Array)
+               params[:fields]&.reject { |field| field[:name].blank? || field[:selector].blank? }
+                              .map { |field| [field[:name], field[:selector]] }.to_h
+             else
+               {}
+             end
+
+    meta_tags = params[:meta]&.reject(&:blank?) || []
 
     # Ensure URL starts with a valid protocol
     unless url =~ /\Ahttps?:\/\//
@@ -21,6 +27,19 @@ class ScrapingController < ApplicationController
         end
         format.json do
           render json: { error: "Invalid URL format." }, status: :unprocessable_entity
+        end
+      end
+      return
+    end
+
+    if fields.empty? && meta_tags.empty?
+      respond_to do |format|
+        format.html do
+          flash[:error] = "Either fields or meta tags must be present"
+          redirect_to root_path
+        end
+        format.json do
+          render json: { error: "Either fields or meta tags must be present" }, status: :unprocessable_entity
         end
       end
       return
