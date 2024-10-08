@@ -13,9 +13,9 @@
 
   <!-- Header -->
   <header class="text-center mb-12">
-      <h1 class="text-5xl font-bold mb-4 text-indigo-700 p-8">
-    <%= link_to "Simple Scraper", root_path %>
-  </h1>
+    <h1 class="text-5xl font-bold mb-4 text-indigo-700 p-8">
+      <%= link_to "Simple Scraper", root_path %>
+    </h1>
     <p class="text-xl text-gray-600">Extract data from any website with ease</p>
   </header>
 
@@ -30,9 +30,9 @@
         <div>
           <label for="url" class="block text-sm font-medium mb-2 text-indigo-600">URL to Scrape</label>
           <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                <i class="fas fa-link"></i>
-              </span>
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+              <i class="fas fa-link"></i>
+            </span>
             <input type="url" id="url" name="url" required
                    class="w-full pl-10 pr-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
           </div>
@@ -45,10 +45,11 @@
             <div class="flex items-center space-x-2">
               <input type="text" name="fields[][name]" placeholder="Field name (e.g., price)"
                      class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-
               <input type="text" name="fields[][selector]" placeholder="CSS selector (e.g., .price-box__price)"
                      class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-
+              <button type="button" class="removeSelector px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+                <i class="fas fa-minus"></i>
+              </button>
               <button type="button" class="addSelector px-3 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors">
                 <i class="fas fa-plus"></i>
               </button>
@@ -63,7 +64,9 @@
             <div class="flex items-center space-x-2">
               <input type="text" name="meta[]" placeholder="Meta tag name (e.g., description)"
                      class="flex-grow px-3 py-2 bg-indigo-50 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-
+              <button type="button" class="removeMetaTag px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+                <i class="fas fa-minus"></i>
+              </button>
               <button type="button" class="addMetaTag px-3 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors">
                 <i class="fas fa-plus"></i>
               </button>
@@ -202,11 +205,27 @@
         });
     });
 
+    document.querySelectorAll('.removeSelector').forEach(button => {
+        button.addEventListener('click', function () {
+            if (this.parentElement.parentElement.childElementCount > 1) {
+                this.parentElement.remove();
+            }
+        });
+    });
+
     document.querySelectorAll('.addMetaTag').forEach(button => {
         button.addEventListener('click', function () {
             const newField = this.parentElement.cloneNode(true);
             newField.querySelector('input').value = '';
             this.parentElement.parentElement.appendChild(newField);
+        });
+    });
+
+    document.querySelectorAll('.removeMetaTag').forEach(button => {
+        button.addEventListener('click', function () {
+            if (this.parentElement.parentElement.childElementCount > 1) {
+                this.parentElement.remove();
+            }
         });
     });
 </script>
