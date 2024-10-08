@@ -1,0 +1,3 @@
+module AppConfig
+  CACHE_EXPIRATION_TIME: ActiveSupport::Duration
+end

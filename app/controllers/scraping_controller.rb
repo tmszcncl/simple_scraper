@@ -50,7 +50,10 @@ class ScrapingController < ApplicationController
       puts "Fields: #{fields.inspect}"
       puts "Meta tags: #{meta_tags.inspect}"
 
-      html = URI.open(url, "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+      html = Rails.cache.fetch(url, expires_in: AppConfig::CACHE_EXPIRATION_TIME) do
+        URI.open(url, "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").read
+      end
+
       doc = Nokogiri::HTML(html)
 
       results = {}
@@ -68,13 +71,13 @@ class ScrapingController < ApplicationController
         end
       end
 
-      host_name = URI.parse(url).host
+      host = URI.parse(url)
 
       scrape_request = ScrapeRequest.create!(
         url: url,
         fields: fields,
         result: { "fields" => results, "meta" => meta_results },
-        host: host_name,
+        host: host,
         scraped_at: Time.now
       )
 
